@@ -69,6 +69,27 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/");
 })
 
+// UPDATE ......POST /urls/:id
+// app.get("/urls/:longURL", (req, res) => {
+//   const longURL = req.params.longURL;
+//   const urls = urlDatabase[longURL];
+//   const templateVars = {
+//     longURL,
+//     urls
+//   };
+//   res.render('edit', templateVars);
+// })
+
+app.post("/urls/:shortURL/update", (req, res) => {
+  // console.log("req.params", req.params)
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = req.body.longURL;
+  // console.log("bodyody", req.body)
+
+  res.redirect("/")
+
+
+})
 
 
 
