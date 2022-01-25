@@ -90,6 +90,16 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
 
 })
+// app.post("/urls/:shortURL", (req, res) => {
+//   console.log("req.params", req.params)
+//   // const shortURL = req.params.shortURL;
+//   // urlDatabase[shortURL] = req.body.longURL;
+//   console.log("bodyody", req.body)
+
+//   // res.redirect("/")
+
+
+// })
 
 
 
