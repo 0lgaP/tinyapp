@@ -50,12 +50,6 @@ app.get("/urls/:shortURL", (req, res) => {
 })
 
 
-
-// app.get("/example/:apple/:orange", (req, res) => {
-//   console.log(req.params);
-//   res.send("example")
-// })
-
 app.get("/u/:shortURL", (req, res) => {
  const longURL = urlDatabase[req.params.shortURL];
 //  console.log(longURL)
@@ -66,18 +60,16 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+// DELETE .....POST /urls/:shortURL/delete
 
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
- });
- 
- app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
- });
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const urlToDelete = req.params.shortURL;
+  delete urlDatabase[urlToDelete];
+  console.log(urlToDelete);
+  res.redirect("/");
+})
+
+
 
 
 //----------------------------------------
