@@ -132,19 +132,9 @@ app.post("/login", (req, res) => {
 
 });
 
-app.post("/signedIN", (req, res) => {
-  // console.log("req.params", req.params)
-  // console.log("bodyody", req.body);
-  // const username = req.body.username;
-  // res.cookie(username, "http://localhost:8080/")
-  //----------IN HERE????
-  const templateVars = {
-    username: req.cookies["username"],
-    shortURL : req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL]  //////////////////////////////////////ADDED STUFF////////////////////////////////////////
-  };
-  res.render("urls_index", templateVars);
-  // res.redirect('/')
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect('/')
 
 
 });
