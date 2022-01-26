@@ -65,14 +65,29 @@ app.get("/", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+// GET User Home.......................................
+app.get("/user/home", (req, res) => {
+  const templateVars = { 
+    urls: urlDatabase,
+    user: users[req.cookies["user_id"]]        ///////////////////////////////ADDED STUFF////////////////////////////////////
+  };
+  // console.log(templateVars.user_id)
+  res.render("urls_index_user", templateVars);
+});
+
 // GET /urls/new .......................................
 app.get("/urls/new", (req, res) => {
+  
   const templateVars = { 
     urls: urlDatabase,
     user: users[req.cookies["user_id"]] 
-           
+    
   };
+  
   console.log(templateVars.user)
+  if(templateVars.user === undefined) {
+    return res.redirect("/login")
+  }
   res.render("urls_new", templateVars);
 });
 
@@ -206,7 +221,7 @@ app.post("/login", (req, res) => {
   //happy path
   res.cookie('user_id', user.id);
 
-  res.redirect("/")
+  res.redirect("/user/home")
 
 })
 
