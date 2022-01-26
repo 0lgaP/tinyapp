@@ -1,13 +1,16 @@
 const express = require("express");
+const morgan = require('morgan');
+const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')
+
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
-const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
-const cookieParser = require('cookie-parser')
 app.use(cookieParser());
+app.use(morgan('dev'));
 
 
 // METHODS ...........................................
@@ -19,19 +22,40 @@ function generateRandomString() {
   }
   return result;
 }
+function findByEmail(email) {
+  //if we find user, return user
+  //if not, return null
+  for (const userID in users) {
+    const user = users[userID];
+    if(user.email === email){
+      return user;
+    }
+  }
+  return null;
+};
 
-// Database ...........................................
+// URL Database ...........................................
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 
 };
 
+// User Database ..........................................
+const users = {
+  'trogdor': {
+    id: 'trogdor',
+    email: 'trog@gmail.com',
+    password: '1234',
+    user_id: "fhqwgads"
+  }
+}
+
 // GET Home ............................................
 app.get("/", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
-    username: req.cookies["username"]         ///////////////////////////////ADDED STUFF////////////////////////////////////
+    user_id: req.cookies["user_id"]         ///////////////////////////////ADDED STUFF////////////////////////////////////
   };
   // console.log(templateVars)
   res.render("urls_index", templateVars);
@@ -41,7 +65,7 @@ app.get("/", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
-    username: req.cookies["username"]        
+    user_id: req.cookies["user_id"]        
   };
   res.render("urls_new", templateVars);
 });
@@ -53,13 +77,12 @@ app.get("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
   if(!allKeys.includes(shortURL)){
     // res.send("404: We could not find the Tiny URL you are looking for")
-    return res.redirect("/urls_404")
-
+    return res.redirect("/urls_404");
   }
   const templateVars = {
     shortURL : req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]         
+    user_id: req.cookies["user_id"]         
   };
   res.render("urls_show", templateVars);
 });
@@ -69,9 +92,21 @@ app.get("/urls_404", (req, res) => {
   const templateVars = {
     shortURL : req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]         
+    user_id: req.cookies["user_id"],
+    message: "Tiny URL requested does not exist. BAM!"        
   };
+
   res.render("urls_404", templateVars)
+})
+
+// GET urls_400 ........................................
+app.get("/urls_400", (req, res) => {
+  const templateVars = {
+    user_id: req.cookies["user_id"],
+    message: "Bad Equest"        
+  };
+console.log(templateVars.username)
+  res.render("urls_400", templateVars)
 })
 
 // GET /u/:shortURL ....................................
@@ -119,23 +154,76 @@ app.post('/urls', (req, res) => {
 });
 
 // LOG IN COOKIE......POST /login ........................
-app.post("/login", (req, res) => {
+// app.post("/login", (req, res) => {
 
-  const username = req.body.username;
-  res.cookie('username', username)
+//   const username = req.body.username;
+//   res.cookie('username', username)
 
-  res.redirect('/')
+//   res.redirect('/')
 
-});
+// });
 
 // LOG OUT ..........POST /logout ........................
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect('/')
 
 });
 
 // REGISTER ..............................................
+// GET REGISTER .......................
+app.get("/register", (req, res) =>{
+  const templateVars = {
+    user_id: req.cookies["user_id"],
+  }
+  res.render("urls_register", templateVars)
+})
+
+// POST REGISTER ......................
+app.post("/register", (req, res) => {
+  const email = req.body.email;
+  console.log(req.body)
+  const password = req.body.password;
+  
+  //check if we are not missing either name or email
+  if(!email || !password){
+    const templateVars = {
+      user_id: req.cookies["user_id"],
+      message: "Missing your email and/or password" 
+    }
+    return res.render("./urls_400", templateVars)
+  }
+  // console.log(templateVars.username) 
+  //find out if email is already registered
+  const user = findByEmail(email);
+  if(user) {
+    const templateVars = {
+      user_id: req.cookies["user_id"],
+      message: "Your email is already signed up!" 
+    }
+    // console.log(templateVars.username)
+    return res.render('./urls_400', templateVars)
+  }
+
+  //add the new user to our users object
+  const id = generateRandomString();
+  const user_id = res.cookie('user_id', id)
+
+  users[id] = {
+    id,
+    email,
+    password,
+    user_id
+  }
+
+  // req.cookie('user_id', userDatabase[id])
+
+
+  console.log(users[id])
+  res.redirect('/')   
+
+})
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

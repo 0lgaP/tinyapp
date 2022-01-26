@@ -4,10 +4,31 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Registration</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
 </head>
 <body>
   <%- include('partials/_header') %>
+  <div class="mx-auto p-3 mb-2 bg-light text-dark">
+    <td>
+      <form action="/register" method="POST">
+        <tr>
+          <label for="Email">Please enter an email address</label>
+          <input type="email" placeholder="email@gmail.com" name="email">
+        </tr>
+        <br>
+        <td>
+          <label for="Password">Please enter a password</label>
+          <input type="text" required placeholder="password" name="password">
+        </td>
+        <br>
+        <td>
+          <button type ="submit" class="btn btn-primary">Submit</button>
+        </td> 
+      </form>
+    </tr> 
+</div>
 
 </body>
 </html>
