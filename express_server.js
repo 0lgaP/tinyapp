@@ -47,7 +47,6 @@ const users = {
     id: 'trogdor',
     email: 'trog@gmail.com',
     password: '1234',
-    user_id: "fhqwgads"
   }
 }
 
@@ -55,9 +54,9 @@ const users = {
 app.get("/", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
-    user_id: req.cookies["user_id"]         ///////////////////////////////ADDED STUFF////////////////////////////////////
+    user: users[req.cookies["user_id"]]        ///////////////////////////////ADDED STUFF////////////////////////////////////
   };
-  // console.log(templateVars)
+  // console.log(templateVars.user_id)
   res.render("urls_index", templateVars);
 });
 
@@ -65,8 +64,10 @@ app.get("/", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
-    user_id: req.cookies["user_id"]        
+    user: users[req.cookies["user_id"]] 
+           
   };
+  console.log(templateVars.user)
   res.render("urls_new", templateVars);
 });
 
@@ -82,7 +83,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL : req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    user_id: req.cookies["user_id"]         
+    user: users[req.cookies["user_id"]]         
   };
   res.render("urls_show", templateVars);
 });
@@ -92,7 +93,7 @@ app.get("/urls_404", (req, res) => {
   const templateVars = {
     shortURL : req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    user_id: req.cookies["user_id"],
+    user: users[req.cookies["user_id"]],
     message: "Tiny URL requested does not exist. BAM!"        
   };
 
@@ -102,10 +103,10 @@ app.get("/urls_404", (req, res) => {
 // GET urls_400 ........................................
 app.get("/urls_400", (req, res) => {
   const templateVars = {
-    user_id: req.cookies["user_id"],
+    user: users[req.cookies["user_id"]],
     message: "Bad Equest"        
   };
-console.log(templateVars.username)
+
   res.render("urls_400", templateVars)
 })
 
@@ -153,15 +154,57 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${newKey}`)
 });
 
-// LOG IN COOKIE......POST /login ........................
-// app.post("/login", (req, res) => {
+// LOG IN GET..............................................
+app.get("/login", (req, res) => {
+  const templateVars = { 
+    urls: urlDatabase,
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("urls_login", templateVars)
+})
 
-//   const username = req.body.username;
-//   res.cookie('username', username)
+// LOG IN POST.......... /login ..........................
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
 
-//   res.redirect('/')
+  //check if we are not missing either name or email
+  if(!email || !password){
+    const templateVars = {
+      user: users[req.cookies["user_id"]],
+      message: "Missing your email and/or password" 
+    }
+    return res.render("./urls_400", templateVars)
+  }
 
-// });
+  //find user based on email
+  const user = findByEmail(email);
+
+  //user not found
+  if(!user) {
+    const templateVars = {
+      user: users[req.cookies["user_id"]],
+      message: "No user with this email was found :'(" 
+    }
+    return res.render("./urls_403", templateVars)
+  }
+
+  //found user, does the password match?
+  if(user.password !== password) {
+    const templateVars = {
+      user: users[req.cookies["user_id"]],
+      message: "Is your caps lock on? Because that's not your password... fool..." 
+    }
+    return res.render("./urls_403", templateVars)
+  }
+
+  //happy path
+  res.cookie('user_id', user.id);
+
+  res.redirect("/")
+
+})
+
 
 // LOG OUT ..........POST /logout ........................
 app.post("/logout", (req, res) => {
@@ -174,34 +217,36 @@ app.post("/logout", (req, res) => {
 // GET REGISTER .......................
 app.get("/register", (req, res) =>{
   const templateVars = {
-    user_id: req.cookies["user_id"],
+    user: users[req.cookies["user_id"]],
+    
   }
+  // console.log(req.cookies["user_id"])
   res.render("urls_register", templateVars)
 })
 
 // POST REGISTER ......................
 app.post("/register", (req, res) => {
   const email = req.body.email;
-  console.log(req.body)
+  // console.log(req.body)
   const password = req.body.password;
   
   //check if we are not missing either name or email
   if(!email || !password){
     const templateVars = {
-      user_id: req.cookies["user_id"],
+      user: users[req.cookies["user_id"]],
       message: "Missing your email and/or password" 
     }
     return res.render("./urls_400", templateVars)
   }
-  // console.log(templateVars.username) 
+
   //find out if email is already registered
   const user = findByEmail(email);
   if(user) {
     const templateVars = {
-      user_id: req.cookies["user_id"],
+      user: users[req.cookies["user_id"]],
       message: "Your email is already signed up!" 
     }
-    // console.log(templateVars.username)
+
     return res.render('./urls_400', templateVars)
   }
 
@@ -213,10 +258,9 @@ app.post("/register", (req, res) => {
     id,
     email,
     password,
-    user_id
-  }
 
-  // req.cookie('user_id', userDatabase[id])
+  }
+console.log(id)
 
 
   console.log(users[id])

@@ -13,18 +13,17 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </li>
       </ul>
-        <% if(user_id){ %>
+        <% if(user){ %>
           <form action="/logout" method="post">
-            <label for="LogOut Button" class="navbar-brand">You are loggin in as: <%= user_id %></label>
+            <label for="LogOut Button" class="navbar-brand">You are loggin in as: <%= user.email %></label>
               <button type="submit" class="btn btn-primary" name="LogOut Button">Log Out</button>
           </form>
 
         <% } else{ %>  
-          
-          <form action="/login" method="post">
-            <input type="text" name="username" placeholder="username">
-              <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
+
+            <a class="btn btn-primary" href="/login" role="button">Login</a>
+            <a class="btn btn-primary" href="/register" role="button">Register</a>
+    
        <% } %>
 
       </div>

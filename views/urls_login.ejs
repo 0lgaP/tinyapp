@@ -4,26 +4,26 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registration</title>
+  <title>Login</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
 </head>
 <body>
   <%- include('partials/_header') %>
   <div class="mx-auto p-3 mb-2 bg-light text-dark">
-    <h1><strong>Register</strong></h1>
-  </div>
+  <h1><strong>LogIn</strong></h1>
+</div>
   <div class="mx-auto p-3 mb-2 bg-light text-dark">
     <td>
-      <form action="/register" method="POST">
+      <form action="/login" method="POST">
         <tr>
-          <label for="Email">Please enter an email address</label>
+          <label for="Email">Please enter your email address</label>
           <input type="email" placeholder="email@gmail.com" name="email">
         </tr>
         <br>
         <td>
-          <label for="Password">Please enter a password</label>
-          <input type="text" required placeholder="password" name="password">
+          <label for="Password">Please enter your password</label>
+          <input type="text" placeholder="password" name="password">
         </td>
         <br>
         <td>
@@ -32,7 +32,7 @@
           <br>
           <br>
           <br>
-          <p>Allready rolling with the best at TinyApp?<a href="/register"> Please login my dove</a></p>
+          <p>Not part of the tinyApp nation yet?<a href="/register"> Come on and register</a></p>
         </td> 
       </form>
     </tr> 
