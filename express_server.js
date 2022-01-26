@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
-    username: req.cookies["username"]         ///////////////////////////////ADDED STUFF////////////////////////////////////
+    username: req.cookies["username"]        
   };
   res.render("urls_new", templateVars);
 });
@@ -61,7 +61,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL : req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]         ///////////////////////////////ADDED STUFF////////////////////////////////////
+    username: req.cookies["username"]         
   };
   res.render("urls_show", templateVars);
 });
@@ -116,26 +116,17 @@ app.post('/urls', (req, res) => {
 //------------------------------------
 // LOG IN COOKIE......POST /login
 app.post("/login", (req, res) => {
-  // console.log("req.params", req.params)
-  // console.log("bodyody", req.body);
+
   const username = req.body.username;
   res.cookie('username', username)
-  //----------IN HERE????
-  // const templateVars = {
-  //   username: req.cookies["username"],
-  //   shortURL : req.params.shortURL, 
-  //   longURL: urlDatabase[req.params.shortURL]  
-  // };
-  // res.render("urls_index", templateVars);  //we don't render on post WE REDIRECT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-  res.redirect('/')
 
+  res.redirect('/')
 
 });
 
 app.post("/logout", (req, res) => {
   res.clearCookie("username");
   res.redirect('/')
-
 
 });
 
