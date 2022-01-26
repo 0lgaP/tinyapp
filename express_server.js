@@ -47,6 +47,11 @@ const users = {
     id: 'trogdor',
     email: 'trog@gmail.com',
     password: '1234',
+  },
+  'fhqwgads': {
+    id: 'fhqwgads',
+    email: 'comeon@gmail.com',
+    password: '5678',
   }
 }
 
