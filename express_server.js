@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser')
 app.use(cookieParser());
 
 
-// Methods --------------------------------------------
+// METHODS ...........................................
 function generateRandomString() {
   let result = "";
   const char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklonmopqrstuvwxyz1234567890";
@@ -20,16 +20,14 @@ function generateRandomString() {
   return result;
 }
 
-
-// Database --------------------------------------------
-
+// Database ...........................................
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 
 };
 
-// Home .... GET /
+// GET Home ............................................
 app.get("/", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
@@ -39,7 +37,7 @@ app.get("/", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// New Url ...  GET /urls/new
+// GET /urls/new .......................................
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
@@ -48,14 +46,14 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-// ShortURL ..... GET /urls/:shortURL
+// GET /urls/:shortURL .................................
 app.get("/urls/:shortURL", (req, res) => {
   // console.log(req.params);
   let allKeys = Object.keys(urlDatabase)
   let shortURL = req.params.shortURL;
   if(!allKeys.includes(shortURL)){
     // res.send("404: We could not find the Tiny URL you are looking for")
-    res.redirect("/")
+    return res.redirect("/urls_404")
 
   }
   const templateVars = {
@@ -66,19 +64,29 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// Use new ShortURL ..... GET /u/:shortURL
+// GET urls_404 ........................................
+app.get("/urls_404", (req, res) => {
+  const templateVars = {
+    shortURL : req.params.shortURL, 
+    longURL: urlDatabase[req.params.shortURL],
+    username: req.cookies["username"]         
+  };
+  res.render("urls_404", templateVars)
+})
+
+// GET /u/:shortURL ....................................
 app.get("/u/:shortURL", (req, res) => {
  const longURL = urlDatabase[req.params.shortURL];
 //  console.log(longURL)
  res.redirect(longURL);
 });
 
+// GET /urls.json ........................................
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-// DELETE .....POST /urls/:shortURL/delete
-
+// DELETE .....POST /urls/:shortURL/delete ...............
 app.post("/urls/:shortURL/delete", (req, res) => {
   const urlToDelete = req.params.shortURL;
   delete urlDatabase[urlToDelete];
@@ -86,9 +94,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/");
 });
 
-
-// UPDATE ....POST /urls/:shortURL/update
-
+// UPDATE ....POST /urls/:shortURL/update ................
 app.post("/urls/:shortURL/update", (req, res) => {
   // console.log("req.params", req.params)
   const shortURL = req.params.shortURL;
@@ -100,8 +106,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
 });
 
-//----------------------------------------
-// EDIT ....POST /urls
+// EDIT ....POST /urls ...................................
 app.post('/urls', (req, res) => {
   let longURL = req.body.longURL;
   if(!longURL.includes("://")){
@@ -113,8 +118,7 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${newKey}`)
 });
 
-//------------------------------------
-// LOG IN COOKIE......POST /login
+// LOG IN COOKIE......POST /login ........................
 app.post("/login", (req, res) => {
 
   const username = req.body.username;
@@ -124,12 +128,14 @@ app.post("/login", (req, res) => {
 
 });
 
+// LOG OUT ..........POST /logout ........................
 app.post("/logout", (req, res) => {
   res.clearCookie("username");
   res.redirect('/')
 
 });
 
+// REGISTER ..............................................
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

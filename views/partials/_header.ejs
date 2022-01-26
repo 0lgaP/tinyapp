@@ -15,7 +15,7 @@
       </ul>
         <% if(username){ %>
           <form action="/logout" method="post">
-            <label for="LogOut Button"><%= username %></label>
+            <label for="LogOut Button" class="navbar-brand">You are loggin in as: <%= username %></label>
               <button type="submit" class="btn btn-primary" name="LogOut Button">Log Out</button>
           </form>
 
