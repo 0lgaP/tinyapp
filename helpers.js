@@ -14,7 +14,7 @@ function findByEmail(email, database) {
   for (const userID in database) {
     const user = database[userID];
     if(user.email === email){
-      return user.id;
+      return user;
     }
   }
   return null;

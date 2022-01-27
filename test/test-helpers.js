@@ -29,8 +29,8 @@ describe("findByMail", () => {
       }
     }
     const email = 'trog@gmail.com'
-    const expectedUserId = 'trogdor'
-    assert.deepEqual(findByEmail(email, users), expectedUserId);
+    
+    assert.deepEqual(findByEmail(email, users), users['trogdor']);
   });
 
   it(`should return null if user is not found`, () => {

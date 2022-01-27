@@ -288,6 +288,7 @@ app.post("/register", (req, res) => {
 
   //find out if email is already registered
   const user = findByEmail(email, users);
+  console.log(user)
   if(user) {
     const templateVars = {
       user: users[req.session['user_id']],
