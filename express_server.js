@@ -69,7 +69,7 @@ const users = {
   }
 }
 
-// GET HOME ............................................
+// GET HOME .............................................."/"
 app.get("/", (req, res) => {
   let freeURLs = userURLOnly(urlDatabase, 'aJ48lW');
   const templateVars = { 
@@ -80,7 +80,7 @@ app.get("/", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// GET  LOGIN..............................................
+// GET  LOGIN............................................."/login"
 app.get("/login", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
@@ -89,7 +89,7 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars)
 });
 
-// GET REGISTER .......................
+// GET REGISTER .........................................."/register"
 app.get("/register", (req, res) =>{
   const templateVars = {
     user: users[req.cookies["user_id"]],
@@ -99,7 +99,7 @@ app.get("/register", (req, res) =>{
   res.render("urls_register", templateVars)
 });
 
-// GET MY URLS.......................................
+// GET MY URLS............................................"/urls"
 app.get("/urls", (req, res) => {
   const user =  users[req.cookies["user_id"]]; 
   console.log("USER.id  at GET MY URLS", user.id)
@@ -123,7 +123,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_my_urls", templateVars);
 });
 
-// GET CREATE NEW URL .......................................
+// GET CREATE NEW URL ...................................."/urls/new"
 app.get("/urls/new", (req, res) => {
   const user =  users[req.cookies["user_id"]]; 
   if(!user){
@@ -140,7 +140,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-// GET SHORT URL........../urls/:shortURL .................................
+// GET SHORT URL.........................................."/urls/:shortURL"
 app.get("/urls/:shortURL", (req, res) => {
   // console.log(req.params);
   let allKeys = Object.keys(urlDatabase)
@@ -157,7 +157,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// GET REDIRECTED TO LONG URL ......./u/:shortURL ....................................
+// GET REDIRECTED TO LONG URL ............................"/u/:shortURL"
 app.get("/u/:shortURL", (req, res) => {
   // console.log(req.params.shortURL);
   let shortURL = req.params.shortURL;
@@ -166,7 +166,7 @@ app.get("/u/:shortURL", (req, res) => {
  res.redirect(longURL);
 });
 
-// GET 404 ........................................
+// GET 404 ..............................................."/urls_404"
 app.get("/urls_404", (req, res) => {
   const templateVars = {
     shortURL : req.params.shortURL, 
@@ -178,8 +178,8 @@ app.get("/urls_404", (req, res) => {
   res.render("urls_404", templateVars)
 });
 
-// GET 403 ........................................
-app.get("/urls_404", (req, res) => {
+// GET 403 ..............................................."/urls_403"
+app.get("/urls_403", (req, res) => {
   const templateVars = {
     shortURL : req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
@@ -190,7 +190,7 @@ app.get("/urls_404", (req, res) => {
   res.render("urls_403", templateVars)
 });
 
-// GET 400 ........................................
+// GET 400 ..............................................."/urls_400"
 app.get("/urls_400", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]],
@@ -200,12 +200,12 @@ app.get("/urls_400", (req, res) => {
   res.render("urls_400", templateVars)
 });
 
-// GET JSON ..../urls.json ........................................
+// GET JSON .............................................."/urls.json"
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-// POST DELETE URL..... /urls/:shortURL/delete ...............
+// POST DELETE URL........................................"/urls/:shortURL/delete"
 app.post("/urls/:shortURL/delete", (req, res) => {
   const user = users[req.cookies["user_id"]]; 
   if(!user){
@@ -217,7 +217,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/");
 });
 
-// POST EDIT URL.... /urls/:shortURL/update ................
+// POST EDIT URL.........................................."/urls/:shortURL/update"
 app.post("/urls/:shortURL/update", (req, res) => {
   const user = users[req.cookies["user_id"]]; 
   if(!user){
@@ -231,7 +231,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
   res.redirect("/")
 });
 
-// POST CREATE NEW URL..../urls ...................................
+// POST CREATE NEW URL...................................."/urls/new"
 app.post('/urls', (req, res) => {
   const user = users[req.cookies["user_id"]]; 
   if(!user) {
@@ -255,7 +255,7 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${newKey}`)
 });
 
-// LOG IN POST.......... /login ..........................
+// LOG IN POST............................................."/login"
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -297,14 +297,14 @@ app.post("/login", (req, res) => {
 
 });
 
-// POST LOGOUT .......... /logout ........................
+// POST LOGOUT ............................................"/logout"
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect('/')
 
 });
 
-// POST REGISTER ......................
+// POST REGISTER .........................................."/register"
 app.post("/register", (req, res) => {
   const email = req.body.email;
   // console.log(req.body)
@@ -348,7 +348,7 @@ console.log(id)
 
 });
 
-
+// LISTNER.................................................
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
