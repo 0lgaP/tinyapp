@@ -8,7 +8,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 !["Enterprise grade errors!"](https://raw.githubusercontent.com/0lgaP/tinyapp/master/docs/errors.png)
 
-!["Create a new URL"](https://github.com/0lgaP/tinyapp/blob/master/docs/createANewTinyURL.png?raw=true)
+!["Create a new URL"](https://raw.githubusercontent.com/0lgaP/tinyapp/master/docs/createANewTinyURl.png)
 
 ## Dependencies
 
