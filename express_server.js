@@ -16,7 +16,7 @@ app.set("view engine", "ejs");
 
 //APP.USE..............................................
 app.use(bodyParser.urlencoded({extended: true}));
-// app.use(cookieParser());
+
 app.use(cookieSession({
   name: 'session',
   keys: ['GAdUaLCToRscfJz7g2ZU', 'zAmLNGvWbr89hOqBsL4q']
@@ -37,11 +37,11 @@ function generateRandomString() {
   }
   return result;
 }
-function findByEmail(email) {
+function findByEmail(email, database) {
   //if we find user, return user
   //if not, return null
-  for (const userID in users) {
-    const user = users[userID];
+  for (const userID in database) {
+    const user = database[userID];
     if(user.email === email){
       return user;
     }
@@ -57,14 +57,7 @@ function userURLOnly(database, userid) {
   }
   return result
 }
-function currentUser(req, res, next) {
-  // Our own custom middleware function
-  const userID = req.session['user_id'];
-  req.currentUser = users[userID];
-  next()
-}
-app.use(currentUser);
-
+const {generateRandomString, findByEmail, userURLOnly} = require()
 // DATABASES..............................................
 const urlDatabase = {
   b6UTxQ: {
@@ -120,9 +113,8 @@ app.get("/register", (req, res) =>{
 
 // GET MY URLS............................................"/urls"
 app.get("/urls", (req, res) => {
-  console.log("USERS", users)
   const user =  users[req.session['user_id']]; 
-  console.log("USER.id  at GET MY URLS", user)
+
   if(!user){
     const templateVars = {
       user: users[req.session['user_id']],
@@ -131,15 +123,11 @@ app.get("/urls", (req, res) => {
     res.render("urls_400", templateVars)
   }
   let userUrls = userURLOnly(urlDatabase, user.id);
-  // console.log("USER URL LIST???", userUrls)
-  
-  console.log("database   ", urlDatabase)
-  console.log("usersreqcookiesuseris  ", user)
+
   const templateVars = { 
     urls: userUrls,
     user: users[req.session['user_id']]
   };
-  console.log(templateVars.urls)
   res.render("urls_my_urls", templateVars);
 });
 
@@ -286,7 +274,7 @@ app.post("/login", (req, res) => {
   }
 
   //find user based on email
-  const user = findByEmail(email);
+  const user = findByEmail(email, users);
 
   //user not found
   if(!user) {
@@ -337,7 +325,7 @@ app.post("/register", (req, res) => {
   }
 
   //find out if email is already registered
-  const user = findByEmail(email);
+  const user = findByEmail(email, users);
   if(user) {
     const templateVars = {
       user: users[req.session['user_id']],
