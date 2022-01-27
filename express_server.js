@@ -34,6 +34,7 @@ function findByEmail(email) {
   return null;
 };
 
+// DATABASES
 const urlDatabase = {
   b6UTxQ: {
       longURL: "https://www.tsn.ca",
@@ -45,14 +46,6 @@ const urlDatabase = {
   }
 };
 
-// URL Database ...........................................
-// const urlDatabase = {
-//   "b2xVn2": "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com",
-
-// };
-
-// User Database ..........................................
 const users = {
   'trogdor': {
     id: 'trogdor',
