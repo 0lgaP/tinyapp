@@ -6,8 +6,8 @@ const {generateRandomString, findByEmail, userURLOnly} = require('../helpers');
 
 describe("generateRandomString", () => {
   it("it returns different strings every time it runs", () => {
-    const input = generateRandomString()
-    const output = generateRandomString()
+    const input = generateRandomString();
+    const output = generateRandomString();
     assert.notEqual(input, output);
   });
 });
@@ -27,8 +27,8 @@ describe("findByMail", () => {
         email: 'comeon@gmail.com',
         password: '4567'
       }
-    }
-    const email = 'trog@gmail.com'
+    };
+    const email = 'trog@gmail.com';
     
     assert.deepEqual(findByEmail(email, users), users['trogdor']);
   });
@@ -45,9 +45,9 @@ describe("findByMail", () => {
         email: 'comeon@gmail.com',
         password: '4567'
       }
-    }
-    const email = 'mochaPassMe@gmail.com'
-    const expectedUserId = 'trogdor'
+    };
+    const email = 'mochaPassMe@gmail.com';
+    const expectedUserId = 'trogdor';
     assert.notEqual(findByEmail(email, users), expectedUserId);
   });
 });
@@ -68,13 +68,13 @@ describe("userURLOnly", () => {
       }
     };
 
-    const userID = "aJ4ldk"
+    const userID = "aJ4ldk";
     const expected = { i3BoGr: {
       longURL: "https://www.google.ca",
       userID: "aJ4ldk"
-    } }
+    } };
 
-    assert.deepEqual(userURLOnly(urlDatabase, userID), expected)
+    assert.deepEqual(userURLOnly(urlDatabase, userID), expected);
 
   });
 });
