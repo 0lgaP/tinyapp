@@ -33,6 +33,16 @@ function findByEmail(email) {
   }
   return null;
 };
+function userURLOnly(database) {
+  let result = [];
+
+  for (const url in database) {
+    result.push(url)
+  }
+
+  return result
+}
+
 
 // DATABASES
 const urlDatabase = {
@@ -98,7 +108,11 @@ app.get("/urls", (req, res) => {
     };
     res.render("urls_400", templateVars)
   }
+  let userUrls = userURLOnly(urlDatabase);
+  console.log("USER URL LIST???", userUrls)
   
+  console.log("database   ", urlDatabase)
+  console.log("usersreqcookiesuseris  ", user)
   const templateVars = { 
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]        ///////////////////////////////ADDED STUFF////////////////////////////////////
@@ -119,6 +133,7 @@ app.get("/urls/new", (req, res) => {
     user: users[req.cookies["user_id"]] 
     
   };
+  console.log("THIS IS THE user_id", users[req.cookies["user_id"]])
   
   res.render("urls_new", templateVars);
 });
@@ -148,7 +163,6 @@ app.get("/u/:shortURL", (req, res) => {
 //  console.log(longURL)
  res.redirect(longURL);
 });
-
 
 // GET 404 ........................................
 app.get("/urls_404", (req, res) => {
@@ -204,9 +218,9 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // POST UPDATE URL.... /urls/:shortURL/update ................
 app.post("/urls/:shortURL/update", (req, res) => {
   const user =  users[req.cookies["user_id"]]; 
-  if(!user){
+  if(!user) {
     return res.redirect("/login")
-  }
+  };
   // console.log("req.params", req.params)
   console.log(urlDatabase)
   const shortURL = req.params.shortURL;
@@ -218,6 +232,10 @@ app.post("/urls/:shortURL/update", (req, res) => {
 
 // POST CREATE NEW URL..../urls ...................................
 app.post('/urls', (req, res) => {
+  const user = users[req.cookies["user_id"]]; 
+  if(!user) {
+    return res.redirect("/login")
+  };
   let longURL = req.body.longURL;
   if(!longURL.includes("://")){
     longURL = "http://" + longURL;
@@ -228,14 +246,13 @@ app.post('/urls', (req, res) => {
 
     urlDatabase[newKey] = {
       longURL,
-      userID: newKey //TODO
+      userID: user.id //TODO
     }
     console.log("Adding new key",urlDatabase)
   }
   // urlDatabase[newKey].longURL = longURL; 
   res.redirect(`/urls/${newKey}`)
 });
-
 
 // LOG IN POST.......... /login ..........................
 app.post("/login", (req, res) => {
@@ -278,7 +295,6 @@ app.post("/login", (req, res) => {
   res.redirect("/")
 
 });
-
 
 // POST LOGOUT .......... /logout ........................
 app.post("/logout", (req, res) => {
