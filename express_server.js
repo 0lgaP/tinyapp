@@ -1,12 +1,12 @@
 // REQUIRE LIST.......................................
 const express = require("express");
 const morgan = require('morgan');
-const uuid = require('uuid/v4');
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs'); 
 const salt = bcrypt.genSaltSync(10);
 const app = express();
+const {generateRandomString, findByEmail, userURLOnly} = require('./helpers')
 
 // DEFAULT PORT........................................
 const PORT = 8080; 
@@ -16,7 +16,6 @@ app.set("view engine", "ejs");
 
 //APP.USE..............................................
 app.use(bodyParser.urlencoded({extended: true}));
-
 app.use(cookieSession({
   name: 'session',
   keys: ['GAdUaLCToRscfJz7g2ZU', 'zAmLNGvWbr89hOqBsL4q']
@@ -28,36 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 // Static assets (images, css files) are being served from the public folder
 app.use(express.static('public'));
 
-// METHODS ..............................................
-function generateRandomString() {
-  let result = "";
-  const char = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklonmopqrstuvwxyz1234567890";
-  for (let i = 0; i < 6; i++){
-    result += char.charAt(Math.floor(Math.random() * char.length));
-  }
-  return result;
-}
-function findByEmail(email, database) {
-  //if we find user, return user
-  //if not, return null
-  for (const userID in database) {
-    const user = database[userID];
-    if(user.email === email){
-      return user;
-    }
-  }
-  return null;
-};
-function userURLOnly(database, userid) {
-  let result = {};
-  for (const url in database) {
-    if (database[url].userID === userid){
-      result[url] = database[url];
-    }
-  }
-  return result
-}
-const {generateRandomString, findByEmail, userURLOnly} = require()
+
 // DATABASES..............................................
 const urlDatabase = {
   b6UTxQ: {
@@ -120,7 +90,7 @@ app.get("/urls", (req, res) => {
       user: users[req.session['user_id']],
       message: "You are not Logged in"        
     };
-    res.render("urls_400", templateVars)
+    res.status(400).render("urls_400", templateVars)
   }
   let userUrls = userURLOnly(urlDatabase, user.id);
 
@@ -154,8 +124,11 @@ app.get("/urls/:shortURL", (req, res) => {
   let allKeys = Object.keys(urlDatabase)
   let shortURL = req.params.shortURL;
   if(!allKeys.includes(shortURL)){
-    // res.send("404: We could not find the Tiny URL you are looking for")
-    return res.redirect("/urls_404");
+    const templateVars = {
+      user: users[req.session['user_id']] ,
+      message: "We could not find the Tiny URL you are looking for"        
+    };
+    return res.status(404).render("urls_404", templateVars)
   }
   const templateVars = {
     shortURL : req.params.shortURL, 
@@ -175,35 +148,28 @@ app.get("/u/:shortURL", (req, res) => {
 // GET 404 ..............................................."/urls_404"
 app.get("/urls_404", (req, res) => {
   const templateVars = {
-    shortURL : req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL],
     user: users[req.session['user_id']] ,
     message: "Not found"        
   };
-
-  res.render("urls_404", templateVars)
+  res.status(404).render("urls_404", templateVars)
 });
 
 // GET 403 ..............................................."/urls_403"
 app.get("/urls_403", (req, res) => {
   const templateVars = {
-    shortURL : req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL],
     user: users[req.session['user_id']],
     message: "Forbiden"        
   };
-
-  res.render("urls_403", templateVars)
+  res.status(403).render("urls_403", templateVars)
 });
 
 // GET 400 ..............................................."/urls_400"
 app.get("/urls_400", (req, res) => {
   const templateVars = {
     user: users[req.session['user_id']],
-    message: "Bad Equest"        
+    message: "Bad Request"        
   };
-
-  res.render("urls_400", templateVars)
+  res.status(400).render("urls_400", templateVars)
 });
 
 // GET JSON .............................................."/urls.json"
@@ -270,7 +236,7 @@ app.post("/login", (req, res) => {
       user: users[req.session['user_id']],
       message: "Missing your email and/or password" 
     }
-    return res.render("./urls_400", templateVars)
+    return res.status(400).render("./urls_400", templateVars)
   }
 
   //find user based on email
@@ -282,16 +248,16 @@ app.post("/login", (req, res) => {
       user: users[req.session['user_id']] ,
       message: "No user with this email was found :'(" 
     }
-    return res.render("./urls_403", templateVars)
+    return res.status(403).render("./urls_403", templateVars)
   }
 
   //found user, does the password match?
  if(!bcrypt.compareSync(password, user.password)) {
     const templateVars = {
       user: users[req.session['user_id']],
-      message: "Is your caps lock on? Because that's not your password... fool..." 
+      message: "Is your caps lock on? Please check that email or password and try again" 
     }
-    return res.render("./urls_403", templateVars)
+    return res.status(403).render("./urls_403", templateVars)
   }
 
   //found user, does hash match?
@@ -321,7 +287,7 @@ app.post("/register", (req, res) => {
       user: users[req.session['user_id']],
       message: "Missing your email and/or password" 
     }
-    return res.render("./urls_400", templateVars)
+    return res.status(400).render("./urls_400", templateVars)
   }
 
   //find out if email is already registered
@@ -331,8 +297,7 @@ app.post("/register", (req, res) => {
       user: users[req.session['user_id']],
       message: "Your email is already signed up!" 
     }
-
-    return res.render('./urls_400', templateVars)
+    return res.status(400).render('./urls_400', templateVars)
   }
 
   //add the new user to our users object
