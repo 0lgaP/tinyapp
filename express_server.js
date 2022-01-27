@@ -34,12 +34,23 @@ function findByEmail(email) {
   return null;
 };
 
-// URL Database ...........................................
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
-
+  b6UTxQ: {
+      longURL: "https://www.tsn.ca",
+      userID: "aJ48lW"
+  },
+  i3BoGr: {
+      longURL: "https://www.google.ca",
+      userID: "aJ48lW"
+  }
 };
+
+// URL Database ...........................................
+// const urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com",
+
+// };
 
 // User Database ..........................................
 const users = {
@@ -65,29 +76,29 @@ app.get("/", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// GET User Home.......................................
-app.get("/user/home", (req, res) => {
-  const templateVars = { 
-    urls: urlDatabase,
-    user: users[req.cookies["user_id"]]        ///////////////////////////////ADDED STUFF////////////////////////////////////
-  };
-  // console.log(templateVars.user_id)
-  res.render("urls_index_user", templateVars);
-});
+// // GET User Home.......................................
+// app.get("/user/home", (req, res) => {
+//   const templateVars = { 
+//     urls: urlDatabase,
+//     user: users[req.cookies["user_id"]]        ///////////////////////////////ADDED STUFF////////////////////////////////////
+//   };
+//   // console.log(templateVars.user_id)
+//   res.render("urls_index_user", templateVars);
+// });
 
 // GET /urls/new .......................................
 app.get("/urls/new", (req, res) => {
-  
+  const user =  users[req.cookies["user_id"]]; 
+  if(!user){
+    return res.redirect("/login")
+  }
+
   const templateVars = { 
     urls: urlDatabase,
     user: users[req.cookies["user_id"]] 
     
   };
   
-  console.log(templateVars.user)
-  if(templateVars.user === undefined) {
-    return res.redirect("/login")
-  }
   res.render("urls_new", templateVars);
 });
 
@@ -102,7 +113,7 @@ app.get("/urls/:shortURL", (req, res) => {
   }
   const templateVars = {
     shortURL : req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[req.cookies["user_id"]]         
   };
   res.render("urls_show", templateVars);
@@ -132,7 +143,7 @@ app.get("/urls_400", (req, res) => {
 
 // GET /u/:shortURL ....................................
 app.get("/u/:shortURL", (req, res) => {
- const longURL = urlDatabase[req.params.shortURL];
+ const longURL = urlDatabase[req.params.shortURL].longURL;
 //  console.log(longURL)
  res.redirect(longURL);
 });
@@ -153,24 +164,30 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // UPDATE ....POST /urls/:shortURL/update ................
 app.post("/urls/:shortURL/update", (req, res) => {
   // console.log("req.params", req.params)
+  console.log(urlDatabase)
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.longURL;
-  // console.log("bodyody", req.body)
+  urlDatabase[shortURL].longURL = req.body.longURL;
+  console.log(urlDatabase)
 
   res.redirect("/")
 
 
 });
 
-// EDIT ....POST /urls ...................................
+// CREATE ....POST /urls ...................................
 app.post('/urls', (req, res) => {
   let longURL = req.body.longURL;
   if(!longURL.includes("://")){
     longURL = "http://" + longURL;
   }
-  // console.log(req.body);
+  console.log(urlDatabase)
   let newKey = generateRandomString();
-  urlDatabase[newKey] = longURL; 
+  urlDatabase[newKey] = {
+    longURL,
+    userID: "" //TODO
+  }
+  console.log(urlDatabase)
+  // urlDatabase[newKey].longURL = longURL; 
   res.redirect(`/urls/${newKey}`)
 });
 
@@ -221,7 +238,7 @@ app.post("/login", (req, res) => {
   //happy path
   res.cookie('user_id', user.id);
 
-  res.redirect("/user/home")
+  res.redirect("/")
 
 })
 
