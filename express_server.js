@@ -58,9 +58,9 @@ app.get("/", (req, res) => {
   let freeURLs = userURLOnly(urlDatabase, 'aJ48lW');
   const templateVars = { 
     urls: freeURLs,
-    user: users[req.session['user_id']]        ///////////////////////////////ADDED STUFF////////////////////////////////////
+    user: users[req.session['user_id']]
   };
-  // console.log(templateVars.user_id)
+
   res.render("urls_index", templateVars);
 });
 
@@ -113,14 +113,12 @@ app.get("/urls/new", (req, res) => {
     user: users[req.session['user_id']]  
     
   };
-  console.log("THIS IS THE user_id", users[req.session['user_id']])
   
   res.render("urls_new", templateVars);
 });
 
 // GET SHORT URL.........................................."/urls/:shortURL"
 app.get("/urls/:shortURL", (req, res) => {
-  // console.log(req.params);
   let allKeys = Object.keys(urlDatabase)
   let shortURL = req.params.shortURL;
   if(!allKeys.includes(shortURL)){
@@ -185,8 +183,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
   const urlToDelete = req.params.shortURL;
   delete urlDatabase[urlToDelete];
-  console.log(urlToDelete);
-  res.redirect("/");
+  res.redirect("/urls");
 });
 
 // POST EDIT URL.........................................."/urls/:shortURL/update"
@@ -197,7 +194,7 @@ app.post("/urls/:shortURL/update", (req, res) => {
   };
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL].longURL = req.body.longURL;
-  console.log(urlDatabase)
+
   res.redirect("/urls")
 });
 
@@ -211,7 +208,7 @@ app.post('/urls', (req, res) => {
   if(!longURL.includes("://")){
     longURL = "http://" + longURL;
   }
-  console.log(urlDatabase)
+
   let newKey = generateRandomString();
   if(!urlDatabase[newKey]) {
 
@@ -219,7 +216,6 @@ app.post('/urls', (req, res) => {
       longURL,
       userID: user.id //TODO
     }
-    console.log("Adding new key",urlDatabase)
   }
   // urlDatabase[newKey].longURL = longURL; 
   res.redirect(`/urls/${newKey}`)
@@ -241,6 +237,7 @@ app.post("/login", (req, res) => {
 
   //find user based on email
   const user = findByEmail(email, users);
+  console.log(user)
 
   //user not found
   if(!user) {
