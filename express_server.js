@@ -237,7 +237,6 @@ app.post("/login", (req, res) => {
 
   //find user based on email
   const user = findByEmail(email, users);
-  console.log(user)
 
   //user not found
   if(!user) {
