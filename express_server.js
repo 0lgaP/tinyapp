@@ -33,13 +33,13 @@ function findByEmail(email) {
   }
   return null;
 };
-function userURLOnly(database) {
-  let result = [];
-
+function userURLOnly(database, userid) {
+  let result = {};
   for (const url in database) {
-    result.push(url)
+    if (database[url].userID === userid){
+      result[url] = database[url];
+    }
   }
-
   return result
 }
 
@@ -71,8 +71,9 @@ const users = {
 
 // GET HOME ............................................
 app.get("/", (req, res) => {
+  let freeURLs = userURLOnly(urlDatabase, 'aJ48lW');
   const templateVars = { 
-    urls: urlDatabase,
+    urls: freeURLs,
     user: users[req.cookies["user_id"]]        ///////////////////////////////ADDED STUFF////////////////////////////////////
   };
   // console.log(templateVars.user_id)
@@ -101,6 +102,7 @@ app.get("/register", (req, res) =>{
 // GET MY URLS.......................................
 app.get("/urls", (req, res) => {
   const user =  users[req.cookies["user_id"]]; 
+  console.log("USER.id  at GET MY URLS", user.id)
   if(!user){
     const templateVars = {
       user: users[req.cookies["user_id"]],
@@ -108,13 +110,13 @@ app.get("/urls", (req, res) => {
     };
     res.render("urls_400", templateVars)
   }
-  let userUrls = userURLOnly(urlDatabase);
+  let userUrls = userURLOnly(urlDatabase, user.id);
   console.log("USER URL LIST???", userUrls)
   
   console.log("database   ", urlDatabase)
   console.log("usersreqcookiesuseris  ", user)
   const templateVars = { 
-    urls: urlDatabase,
+    urls: userUrls,
     user: users[req.cookies["user_id"]]        ///////////////////////////////ADDED STUFF////////////////////////////////////
   };
   console.log(templateVars.urls)
@@ -205,7 +207,7 @@ app.get("/urls.json", (req, res) => {
 
 // POST DELETE URL..... /urls/:shortURL/delete ...............
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const user =  users[req.cookies["user_id"]]; 
+  const user = users[req.cookies["user_id"]]; 
   if(!user){
     return res.redirect("/login")
   }
@@ -215,18 +217,17 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/");
 });
 
-// POST UPDATE URL.... /urls/:shortURL/update ................
+// POST EDIT URL.... /urls/:shortURL/update ................
 app.post("/urls/:shortURL/update", (req, res) => {
-  const user =  users[req.cookies["user_id"]]; 
-  if(!user) {
+  const user = users[req.cookies["user_id"]]; 
+  if(!user){
     return res.redirect("/login")
   };
   // console.log("req.params", req.params)
-  console.log(urlDatabase)
+  // console.log(urlDatabase)
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL].longURL = req.body.longURL;
   console.log(urlDatabase)
-
   res.redirect("/")
 });
 
