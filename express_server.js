@@ -37,12 +37,12 @@ function findByEmail(email) {
 // DATABASES
 const urlDatabase = {
   b6UTxQ: {
-      longURL: "https://www.tsn.ca",
-      userID: "aJ48lW"
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW"
   },
   i3BoGr: {
-      longURL: "https://www.google.ca",
-      userID: "aJ48lW"
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW"
   }
 };
 
@@ -59,7 +59,7 @@ const users = {
   }
 }
 
-// GET Home ............................................
+// GET HOME ............................................
 app.get("/", (req, res) => {
   const templateVars = { 
     urls: urlDatabase,
@@ -69,17 +69,45 @@ app.get("/", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// // GET User Home.......................................
-// app.get("/user/home", (req, res) => {
-//   const templateVars = { 
-//     urls: urlDatabase,
-//     user: users[req.cookies["user_id"]]        ///////////////////////////////ADDED STUFF////////////////////////////////////
-//   };
-//   // console.log(templateVars.user_id)
-//   res.render("urls_index_user", templateVars);
-// });
+// GET  LOGIN..............................................
+app.get("/login", (req, res) => {
+  const templateVars = { 
+    urls: urlDatabase,
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("urls_login", templateVars)
+});
 
-// GET /urls/new .......................................
+// GET REGISTER .......................
+app.get("/register", (req, res) =>{
+  const templateVars = {
+    user: users[req.cookies["user_id"]],
+    
+  }
+  // console.log(req.cookies["user_id"])
+  res.render("urls_register", templateVars)
+});
+
+// GET MY URLS.......................................
+app.get("/urls", (req, res) => {
+  const user =  users[req.cookies["user_id"]]; 
+  if(!user){
+    const templateVars = {
+      user: users[req.cookies["user_id"]],
+      message: "You are not Logged in"        
+    };
+    res.render("urls_400", templateVars)
+  }
+  
+  const templateVars = { 
+    urls: urlDatabase,
+    user: users[req.cookies["user_id"]]        ///////////////////////////////ADDED STUFF////////////////////////////////////
+  };
+  console.log(templateVars.urls)
+  res.render("urls_my_urls", templateVars);
+});
+
+// GET CREATE NEW URL .......................................
 app.get("/urls/new", (req, res) => {
   const user =  users[req.cookies["user_id"]]; 
   if(!user){
@@ -95,7 +123,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-// GET /urls/:shortURL .................................
+// GET SHORT URL........../urls/:shortURL .................................
 app.get("/urls/:shortURL", (req, res) => {
   // console.log(req.params);
   let allKeys = Object.keys(urlDatabase)
@@ -112,19 +140,41 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// GET urls_404 ........................................
+// GET REDIRECTED TO LONG URL ......./u/:shortURL ....................................
+app.get("/u/:shortURL", (req, res) => {
+  // console.log(req.params.shortURL);
+  let shortURL = req.params.shortURL;
+ const longURL = urlDatabase[shortURL].longURL;
+//  console.log(longURL)
+ res.redirect(longURL);
+});
+
+
+// GET 404 ........................................
 app.get("/urls_404", (req, res) => {
   const templateVars = {
     shortURL : req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
     user: users[req.cookies["user_id"]],
-    message: "Tiny URL requested does not exist. BAM!"        
+    message: "Not found"        
   };
 
   res.render("urls_404", templateVars)
-})
+});
 
-// GET urls_400 ........................................
+// GET 403 ........................................
+app.get("/urls_404", (req, res) => {
+  const templateVars = {
+    shortURL : req.params.shortURL, 
+    longURL: urlDatabase[req.params.shortURL],
+    user: users[req.cookies["user_id"]],
+    message: "Forbiden"        
+  };
+
+  res.render("urls_403", templateVars)
+});
+
+// GET 400 ........................................
 app.get("/urls_400", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]],
@@ -132,30 +182,31 @@ app.get("/urls_400", (req, res) => {
   };
 
   res.render("urls_400", templateVars)
-})
-
-// GET /u/:shortURL ....................................
-app.get("/u/:shortURL", (req, res) => {
- const longURL = urlDatabase[req.params.shortURL].longURL;
-//  console.log(longURL)
- res.redirect(longURL);
 });
 
-// GET /urls.json ........................................
+// GET JSON ..../urls.json ........................................
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-// DELETE .....POST /urls/:shortURL/delete ...............
+// POST DELETE URL..... /urls/:shortURL/delete ...............
 app.post("/urls/:shortURL/delete", (req, res) => {
+  const user =  users[req.cookies["user_id"]]; 
+  if(!user){
+    return res.redirect("/login")
+  }
   const urlToDelete = req.params.shortURL;
   delete urlDatabase[urlToDelete];
   console.log(urlToDelete);
   res.redirect("/");
 });
 
-// UPDATE ....POST /urls/:shortURL/update ................
+// POST UPDATE URL.... /urls/:shortURL/update ................
 app.post("/urls/:shortURL/update", (req, res) => {
+  const user =  users[req.cookies["user_id"]]; 
+  if(!user){
+    return res.redirect("/login")
+  }
   // console.log("req.params", req.params)
   console.log(urlDatabase)
   const shortURL = req.params.shortURL;
@@ -163,11 +214,9 @@ app.post("/urls/:shortURL/update", (req, res) => {
   console.log(urlDatabase)
 
   res.redirect("/")
-
-
 });
 
-// CREATE ....POST /urls ...................................
+// POST CREATE NEW URL..../urls ...................................
 app.post('/urls', (req, res) => {
   let longURL = req.body.longURL;
   if(!longURL.includes("://")){
@@ -175,23 +224,18 @@ app.post('/urls', (req, res) => {
   }
   console.log(urlDatabase)
   let newKey = generateRandomString();
-  urlDatabase[newKey] = {
-    longURL,
-    userID: "" //TODO
+  if(!urlDatabase[newKey]) {
+
+    urlDatabase[newKey] = {
+      longURL,
+      userID: newKey //TODO
+    }
+    console.log("Adding new key",urlDatabase)
   }
-  console.log(urlDatabase)
   // urlDatabase[newKey].longURL = longURL; 
   res.redirect(`/urls/${newKey}`)
 });
 
-// LOG IN GET..............................................
-app.get("/login", (req, res) => {
-  const templateVars = { 
-    urls: urlDatabase,
-    user: users[req.cookies["user_id"]]
-  };
-  res.render("urls_login", templateVars)
-})
 
 // LOG IN POST.......... /login ..........................
 app.post("/login", (req, res) => {
@@ -233,26 +277,15 @@ app.post("/login", (req, res) => {
 
   res.redirect("/")
 
-})
+});
 
 
-// LOG OUT ..........POST /logout ........................
+// POST LOGOUT .......... /logout ........................
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect('/')
 
 });
-
-// REGISTER ..............................................
-// GET REGISTER .......................
-app.get("/register", (req, res) =>{
-  const templateVars = {
-    user: users[req.cookies["user_id"]],
-    
-  }
-  // console.log(req.cookies["user_id"])
-  res.render("urls_register", templateVars)
-})
 
 // POST REGISTER ......................
 app.post("/register", (req, res) => {
@@ -296,7 +329,7 @@ console.log(id)
   console.log(users[id])
   res.redirect('/')   
 
-})
+});
 
 
 app.listen(PORT, () => {
